@@ -1,68 +1,45 @@
-import { Container, Flex, Link, Skeleton, SkeletonCircle, Text, VStack } from "@chakra-ui/react";
-import ProfileHeader from "../../components/Profile/ProfileHeader";
-import ProfileTabs from "../../components/Profile/ProfileTabs";
-import ProfilePosts from "../../components/Profile/ProfilePosts";
-import useGetUserProfileByUsername from "../../hooks/useGetUserProfileByUsername";
-import { useParams } from "react-router-dom";
-import { Link as RouterLink } from "react-router-dom";
+import { Box, Flex, Image, Text, VStack } from "@chakra-ui/react";
+import { useState } from "react";
+import Login from "./Login";
+import Signup from "./Signup";
+import GoogleAuth from "./GoogleAuth";
 
-const ProfilePage = () => {
-	const { username } = useParams();
-	const { isLoading, userProfile } = useGetUserProfileByUsername(username);
-
-	const userNotFound = !isLoading && !userProfile;
-	if (userNotFound) return <UserNotFound />;
+const AuthForm = () => {
+	const [isLogin, setIsLogin] = useState(true);
 
 	return (
-		<Container maxW='container.lg' py={5}>
-			<Flex py={10} px={4} pl={{ base: 4, md: 10 }} w={"full"} mx={"auto"} flexDirection={"column"}>
-				{!isLoading && userProfile && <ProfileHeader />}
-				{isLoading && <ProfileHeaderSkeleton />}
-			</Flex>
-			<Flex
-				px={{ base: 2, sm: 4 }}
-				maxW={"full"}
-				mx={"auto"}
-				borderTop={"1px solid"}
-				borderColor={"whiteAlpha.300"}
-				direction={"column"}
-			>
-				<ProfileTabs />
-				<ProfilePosts />
-			</Flex>
-		</Container>
+		<>
+			<Box border={"1px solid gray"} borderRadius={4} padding={5}>
+				<VStack spacing={4}>
+					<Image src='/logo.png' h={24} cursor={"pointer"} alt='Instagram' />
+
+					{isLogin ? <Login /> : <Signup />}
+
+					{/* ---------------- OR -------------- */}
+					<Flex alignItems={"center"} justifyContent={"center"} my={4} gap={1} w={"full"}>
+						<Box flex={2} h={"1px"} bg={"gray.400"} />
+						<Text mx={1} color={"white"}>
+							OR
+						</Text>
+						<Box flex={2} h={"1px"} bg={"gray.400"} />
+					</Flex>
+
+					<GoogleAuth prefix={isLogin ? "Log in" : "Sign up"} />
+				</VStack>
+			</Box>
+
+			<Box border={"1px solid gray"} borderRadius={4} padding={5}>
+				<Flex alignItems={"center"} justifyContent={"center"}>
+					<Box mx={2} fontSize={14}>
+						{isLogin ? "Don't have an account?" : "Already have an account?"}
+					</Box>
+					<Box onClick={() => setIsLogin(!isLogin)} color={"blue.500"} cursor={"pointer"}>
+						{isLogin ? "Sign up" : "Log in"}
+					</Box>
+				</Flex>
+			</Box>
+		</>
 	);
 };
 
-export default ProfilePage;
-
-// skeleton for profile header
-const ProfileHeaderSkeleton = () => {
-	return (
-		<Flex
-			gap={{ base: 4, sm: 10 }}
-			py={10}
-			direction={{ base: "column", sm: "row" }}
-			justifyContent={"center"}
-			alignItems={"center"}
-		>
-			<SkeletonCircle size='24' />
-
-			<VStack alignItems={{ base: "center", sm: "flex-start" }} gap={2} mx={"auto"} flex={1}>
-				<Skeleton height='12px' width='150px' />
-				<Skeleton height='12px' width='100px' />
-			</VStack>
-		</Flex>
-	);
-};
-
-const UserNotFound = () => {
-	return (
-		<Flex flexDir='column' textAlign={"center"} mx={"auto"}>
-			<Text fontSize={"2xl"}>User Not Found</Text>
-			<Link as={RouterLink} to={"/"} color={"blue.500"} w={"max-content"} mx={"auto"}>
-				Go home
-			</Link>
-		</Flex>
-	);
-};
+export default AuthForm;
